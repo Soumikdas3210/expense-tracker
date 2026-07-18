@@ -40,3 +40,24 @@ class ConfirmDialog:
         result = messagebox.askyesno(title, message)
         return result
 
+class CategoryDropdown(ttk.Combobox):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.refresh_categories()
+
+    def refresh_categories(self):
+        categories = storage.load_categories()
+
+        category_names = []
+        for category in categories:
+            category_names.append(category["name"])
+
+        self["values"] = category_names
+
+
+def show_error(message):
+    messagebox.showerror("Error", message)
+
+
+def show_success(message):
+    messagebox.showinfo("Success", message)
