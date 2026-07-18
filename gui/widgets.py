@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import messagebox, ttk
+from services import storage
 
 class SummaryCard(tk.Frame):
     def __init__(self, parent, title, value):
