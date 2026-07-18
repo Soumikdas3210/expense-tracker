@@ -1,0 +1,2 @@
+id,date,category,amount,payment_method,description,notes,is_recurring
+1,2026-07-18,Food,250.0,Cash,Groceries,,False

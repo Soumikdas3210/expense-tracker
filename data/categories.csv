@@ -1,0 +1,12 @@
+id,name,is_default
+1,Food,True
+2,Transport,True
+3,Shopping,True
+4,Entertainment,True
+5,Education,True
+6,Medical,True
+7,Bills,True
+8,Rent,True
+9,Salary,True
+10,Investment,True
+11,Others,True
