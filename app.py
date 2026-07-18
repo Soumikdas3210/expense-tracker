@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import Menu
+from tkinter import messagebox
 
 
 class ExpenseTrackerApp(tk.Tk):
@@ -43,7 +44,43 @@ class ExpenseTrackerApp(tk.Tk):
         help_menu.add_command(label="About", command=self.on_about)
         menu_bar.add_cascade(label="Help", menu=help_menu)
 
-        self.config(menu=menu_bar)             
+        self.config(menu=menu_bar)
+
+    def build_frames(self):
+        placeholder = tk.Frame(self.container)
+        placeholder_label = tk.Label(placeholder, text="Dashboard - built in Task 4", font=("Arial", 14))
+        placeholder_label.pack(pady=50)
+        placeholder.place(x=0, y=0, relwidth=1, relheight=1)
+
+        self.frames["Dashboard"] = placeholder
+
+    def show_frame(self, name):
+        frame = self.frames[name]
+        frame.tkraise()
+
+    def on_import_csv(self):
+        messagebox.showinfo("Coming Soon", "Import CSV is not built yet.")
+
+    def on_export_csv(self):
+        messagebox.showinfo("Coming Soon", "Export CSV is not built yet.")
+
+    def on_manage_categories(self):
+        messagebox.showinfo("Coming Soon", "Categories screen is coming in Milestone 5.")
+
+    def on_manage_budgets(self):
+        messagebox.showinfo("Coming Soon", "Budgets screen is coming in Milestone 5.")
+
+    def on_view_dashboard(self):
+        self.show_frame("Dashboard")
+
+    def on_view_analytics(self):
+        messagebox.showinfo("Coming Soon", "Analytics screen is coming in Milestone 6.")
+
+    def on_view_reports(self):
+        messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
+
+    def on_about(self):
+        messagebox.showinfo("About", "Personal Expense Tracker\nBuilt with Python, Tkinter, and NumPy.")                 
 
 if __name__ == "__main__":
     app = ExpenseTrackerApp()
