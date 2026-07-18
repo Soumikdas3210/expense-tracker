@@ -24,6 +24,7 @@ Thumbs.db
 # Testing (if you use pytest per §11, otherwise harmless to leave in)
 .pytest_cache/
 .coverage
+test_services*.py
 
 # Logs
 *.log
