@@ -5,8 +5,9 @@ from gui.widgets import CategoryDropdown
 from services import expense_service
 from services import income_service
 from services import budget_service
-from utils import get_today_str
-from utils import format_currency
+from utils.helpers import get_today_str
+from utils.helpers import format_currency
+from tkinter import messagebox
 
 
 class DashboardFrame(tk.Frame):
@@ -162,5 +163,51 @@ class DashboardFrame(tk.Frame):
         for expense in results:
             row_values = (expense.date, expense.category, format_currency(expense.amount), expense.payment_method, expense.description)
             self.table.insert("", "end", iid=str(expense.id), values=row_values)
+
+    def on_clear_search(self):
+        self.keyword_entry.delete(0, "end")
+        self.category_filter.set("")
+        self.refresh_transaction_table()
+
+    def get_selected_expense_id(self):
+        selection = self.table.selection()
+        if len(selection) == 0:
+            return None
+        selected_id_str = selection[0]
+        return int(selected_id_str)
+
+    def on_add_expense(self):
+        messagebox.showinfo("Coming Soon", "Add Expense screen is coming in Milestone 4.")
+
+    def on_add_income(self):
+        messagebox.showinfo("Coming Soon", "Add Income screen is coming in Milestone 4.")
+
+    def on_edit_selected(self):
+        expense_id = self.get_selected_expense_id()
+        if expense_id is None:
+            messagebox.showinfo("No Selection", "Select a transaction first.")
+            return
+        messagebox.showinfo("Coming Soon", "Edit screen is coming in Milestone 4.")
+
+    def on_delete_selected(self):
+        expense_id = self.get_selected_expense_id()
+        if expense_id is None:
+            messagebox.showinfo("No Selection", "Select a transaction first.")
+            return
+
+        confirmed = messagebox.askyesno("Confirm Delete", "Delete this transaction?")
+        if confirmed == True:
+            expense_service.delete_expense(expense_id)
+            self.refresh_summary()
+            self.refresh_transaction_table()
+
+    def open_analytics(self):
+        messagebox.showinfo("Coming Soon", "Analytics screen is coming in Milestone 6.")
+
+    def open_reports(self):
+        messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
+
+    def open_settings(self):
+        messagebox.showinfo("Coming Soon", "Settings screen is coming in Milestone 5.")        
 
    

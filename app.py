@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import Menu
 from tkinter import messagebox
 
+from gui.dashboard import DashboardFrame
+
 
 class ExpenseTrackerApp(tk.Tk):
 
@@ -47,12 +49,9 @@ class ExpenseTrackerApp(tk.Tk):
         self.config(menu=menu_bar)
 
     def build_frames(self):
-        placeholder = tk.Frame(self.container)
-        placeholder_label = tk.Label(placeholder, text="Dashboard - built in Task 4", font=("Arial", 14))
-        placeholder_label.pack(pady=50)
-        placeholder.place(x=0, y=0, relwidth=1, relheight=1)
-
-        self.frames["Dashboard"] = placeholder
+        dashboard_frame = DashboardFrame(self.container, self)
+        dashboard_frame.place(x=0, y=0, relwidth=1, relheight=1)
+        self.frames["Dashboard"] = dashboard_frame
 
     def show_frame(self, name):
         frame = self.frames[name]
