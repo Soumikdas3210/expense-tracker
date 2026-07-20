@@ -27,4 +27,48 @@ class AddIncomeWindow(tk.Toplevel):
             income = income_service.get_income_by_id(income_id)
             self.populate_for_edit(income)
 
-   
+    def build_form(self):
+        date_label = tk.Label(self, text="Date (YYYY-MM-DD)")
+        date_label.pack(padx=10, pady=(10, 0), anchor="w")
+        self.date_entry = tk.Entry(self)
+        self.date_entry.pack(padx=10, fill="x")
+        self.date_error_label = tk.Label(self, text="", fg="red")
+        self.date_error_label.pack(padx=10, anchor="w")
+
+        source_label = tk.Label(self, text="Source")
+        source_label.pack(padx=10, pady=(10, 0), anchor="w")
+        self.source_dropdown = ttk.Combobox(self, values=INCOME_SOURCES)
+        self.source_dropdown.pack(padx=10, fill="x")
+        self.source_error_label = tk.Label(self, text="", fg="red")
+        self.source_error_label.pack(padx=10, anchor="w")
+
+        amount_label = tk.Label(self, text="Amount")
+        amount_label.pack(padx=10, pady=(10, 0), anchor="w")
+        self.amount_entry = tk.Entry(self)
+        self.amount_entry.pack(padx=10, fill="x")
+        self.amount_error_label = tk.Label(self, text="", fg="red")
+        self.amount_error_label.pack(padx=10, anchor="w")
+
+        description_label = tk.Label(self, text="Description")
+        description_label.pack(padx=10, pady=(10, 0), anchor="w")
+        self.description_entry = tk.Entry(self)
+        self.description_entry.pack(padx=10, fill="x")
+        self.description_error_label = tk.Label(self, text="", fg="red")
+        self.description_error_label.pack(padx=10, anchor="w")
+
+        button_frame = tk.Frame(self)
+        button_frame.pack(padx=10, pady=10, fill="x")
+
+        save_button = tk.Button(button_frame, text="Save", command=self.on_save)
+        save_button.pack(side="left", padx=5)
+
+        cancel_button = tk.Button(button_frame, text="Cancel", command=self.on_cancel)
+        cancel_button.pack(side="left", padx=5)
+
+    def populate_for_edit(self, income):
+        self.date_entry.insert(0, income.date)
+        self.source_dropdown.set(income.source)
+        self.amount_entry.insert(0, str(income.amount))
+        self.description_entry.insert(0, income.description)
+
+  
