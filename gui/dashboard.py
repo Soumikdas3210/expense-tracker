@@ -8,6 +8,8 @@ from services import budget_service
 from utils.helpers import get_today_str
 from utils.helpers import format_currency
 from tkinter import messagebox
+from gui.add_expense import AddExpenseWindow
+from gui.add_income import AddIncomeWindow
 
 
 class DashboardFrame(tk.Frame):
