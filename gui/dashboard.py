@@ -179,17 +179,21 @@ class DashboardFrame(tk.Frame):
         return int(selected_id_str)
 
     def on_add_expense(self):
-        messagebox.showinfo("Coming Soon", "Add Expense screen is coming in Milestone 4.")
+        AddExpenseWindow(self, on_success=self.on_transaction_saved)
 
     def on_add_income(self):
-        messagebox.showinfo("Coming Soon", "Add Income screen is coming in Milestone 4.")
+        AddIncomeWindow(self, on_success=self.on_transaction_saved)
 
     def on_edit_selected(self):
         expense_id = self.get_selected_expense_id()
         if expense_id is None:
             messagebox.showinfo("No Selection", "Select a transaction first.")
             return
-        messagebox.showinfo("Coming Soon", "Edit screen is coming in Milestone 4.")
+        AddExpenseWindow(self, on_success=self.on_transaction_saved, expense_id=expense_id)
+
+    def on_transaction_saved(self):
+        self.refresh_summary()
+        self.refresh_transaction_table()
 
     def on_delete_selected(self):
         expense_id = self.get_selected_expense_id()
