@@ -89,5 +89,90 @@ class AddExpenseWindow(tk.Toplevel):
         self.description_entry.insert(0, expense.description)
         self.notes_text.insert("1.0", expense.notes)
         self.recurring_var.set(expense.is_recurring)
+        
+    def validate_form(self):
+        is_valid = True
 
+        date_value = self.date_entry.get()
+        if validators.validate_date(date_value) == True:
+            self.date_error_label.config(text="")
+        else:
+            self.date_error_label.config(text="Date must be in YYYY-MM-DD format.")
+            is_valid = False
+
+        category_value = self.category_dropdown.get()
+        valid_categories = self.category_dropdown["values"]
+        if validators.validate_category(category_value, valid_categories) == True:
+            self.category_error_label.config(text="")
+        else:
+            self.category_error_label.config(text="Please select a valid category.")
+            is_valid = False
+
+        amount_value = self.amount_entry.get()
+        if validators.validate_amount(amount_value) == True:
+            self.amount_error_label.config(text="")
+        else:
+            self.amount_error_label.config(text="Amount must be a positive number.")
+            is_valid = False
+
+        payment_value = self.payment_dropdown.get()
+        if validators.validate_payment_method(payment_value) == True:
+            self.payment_error_label.config(text="")
+        else:
+            self.payment_error_label.config(text="Please select a valid payment method.")
+            is_valid = False
+
+        description_value = self.description_entry.get()
+        if validators.validate_description(description_value) == True:
+            self.description_error_label.config(text="")
+        else:
+            self.description_error_label.config(text="Description must be 100 characters or fewer.")
+            is_valid = False
+
+        return is_valid
+
+    def on_save(self):
+        form_is_valid = self.validate_form()
+        if form_is_valid == False:
+            return
+
+        date_value = self.date_entry.get()
+        category_value = self.category_dropdown.get()
+        amount_value = float(self.amount_entry.get())
+        payment_value = self.payment_dropdown.get()
+        description_value = self.description_entry.get()
+        notes_value = self.notes_text.get("1.0", "end-1c")
+        recurring_value = self.recurring_var.get()
+
+        if self.expense_id is None:
+            expense_service.add_expense(
+                date=date_value,
+                category=category_value,
+                amount=amount_value,
+                payment_method=payment_value,
+                description=description_value,
+                notes=notes_value,
+                is_recurring=recurring_value,
+            )
+            show_success("Expense added.")
+        else:
+            expense_service.edit_expense(
+                self.expense_id,
+                date=date_value,
+                category=category_value,
+                amount=amount_value,
+                payment_method=payment_value,
+                description=description_value,
+                notes=notes_value,
+                is_recurring=recurring_value,
+            )
+            show_success("Expense updated.")
+
+        if self.on_success is not None:
+            self.on_success()
+
+        self.destroy()
+
+    def on_cancel(self):
+        self.destroy()
   
