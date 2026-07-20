@@ -71,4 +71,73 @@ class AddIncomeWindow(tk.Toplevel):
         self.amount_entry.insert(0, str(income.amount))
         self.description_entry.insert(0, income.description)
 
+    def validate_form(self):
+        is_valid = True
+
+        date_value = self.date_entry.get()
+        if validators.validate_date(date_value) == True:
+            self.date_error_label.config(text="")
+        else:
+            self.date_error_label.config(text="Date must be in YYYY-MM-DD format.")
+            is_valid = False
+
+        source_value = self.source_dropdown.get()
+        if source_value in INCOME_SOURCES:
+            self.source_error_label.config(text="")
+        else:
+            self.source_error_label.config(text="Please select a valid source.")
+            is_valid = False
+
+        amount_value = self.amount_entry.get()
+        if validators.validate_amount(amount_value) == True:
+            self.amount_error_label.config(text="")
+        else:
+            self.amount_error_label.config(text="Amount must be a positive number.")
+            is_valid = False
+
+        description_value = self.description_entry.get()
+        if validators.validate_description(description_value) == True:
+            self.description_error_label.config(text="")
+        else:
+            self.description_error_label.config(text="Description must be 100 characters or fewer.")
+            is_valid = False
+
+        return is_valid
+
+    def on_save(self):
+        form_is_valid = self.validate_form()
+        if form_is_valid == False:
+            return
+
+        date_value = self.date_entry.get()
+        source_value = self.source_dropdown.get()
+        amount_value = float(self.amount_entry.get())
+        description_value = self.description_entry.get()
+
+        if self.income_id is None:
+            income_service.add_income(
+                date=date_value,
+                source=source_value,
+                amount=amount_value,
+                description=description_value,
+            )
+            show_success("Income added.")
+        else:
+            income_service.edit_income(
+                self.income_id,
+                date=date_value,
+                source=source_value,
+                amount=amount_value,
+                description=description_value,
+            )
+            show_success("Income updated.")
+
+        if self.on_success is not None:
+            self.on_success()
+
+        self.destroy()
+
+    def on_cancel(self):
+        self.destroy()
+
   
