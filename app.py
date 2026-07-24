@@ -3,9 +3,17 @@ from tkinter import Menu
 from tkinter import messagebox
 
 from gui.dashboard import DashboardFrame
+from gui.settings import SettingsFrame
 
 
 class ExpenseTrackerApp(tk.Tk):
+    """
+    Root window / shell for the Expense Tracker app.
+
+    Holds no business logic - only wires services to GUI callbacks,
+    and switches between full-screen "frames" (pages) inside one
+    container Frame using show_frame(name).
+    """
 
     def __init__(self):
         super().__init__()
@@ -42,7 +50,7 @@ class ExpenseTrackerApp(tk.Tk):
         view_menu.add_command(label="Reports", command=self.on_view_reports)
         menu_bar.add_cascade(label="View", menu=view_menu)
 
-        help_menu = tk.Menu(menu_bar, tearoff=0)
+        help_menu = Menu(menu_bar, tearoff=0)
         help_menu.add_command(label="About", command=self.on_about)
         menu_bar.add_cascade(label="Help", menu=help_menu)
 
@@ -53,21 +61,25 @@ class ExpenseTrackerApp(tk.Tk):
         dashboard_frame.place(x=0, y=0, relwidth=1, relheight=1)
         self.frames["Dashboard"] = dashboard_frame
 
+        settings_frame = SettingsFrame(self.container, self)
+        settings_frame.place(x=0, y=0, relwidth=1, relheight=1)
+        self.frames["Settings"] = settings_frame
+
     def show_frame(self, name):
         frame = self.frames[name]
         frame.tkraise()
 
     def on_import_csv(self):
-        messagebox.showinfo("Coming Soon", "Import CSV is not built yet.")
+        self.show_frame("Settings")
 
     def on_export_csv(self):
-        messagebox.showinfo("Coming Soon", "Export CSV is not built yet.")
+        self.show_frame("Settings")
 
     def on_manage_categories(self):
-        messagebox.showinfo("Coming Soon", "Categories screen is coming in Milestone 5.")
+        self.show_frame("Settings")
 
     def on_manage_budgets(self):
-        messagebox.showinfo("Coming Soon", "Budgets screen is coming in Milestone 5.")
+        self.show_frame("Settings")
 
     def on_view_dashboard(self):
         self.show_frame("Dashboard")
@@ -79,8 +91,9 @@ class ExpenseTrackerApp(tk.Tk):
         messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
 
     def on_about(self):
-        messagebox.showinfo("About", "Personal Expense Tracker\nBuilt with Python, Tkinter, and NumPy.")                 
+        messagebox.showinfo("About", "Personal Expense Tracker\nBuilt with Python, Tkinter, and NumPy.")
+
 
 if __name__ == "__main__":
     app = ExpenseTrackerApp()
-    app.mainloop()       
+    app.mainloop()
