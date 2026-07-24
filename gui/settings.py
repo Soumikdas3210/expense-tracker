@@ -119,10 +119,18 @@ class SettingsFrame(tk.Frame):
                 remaining_categories.append(category)
 
         storage.save_categories(remaining_categories)
+
+        all_budgets = storage.load_budgets()
+        remaining_budgets = []
+        for budget_row in all_budgets:
+            if budget_row["category"] != selected_category["name"]:
+                remaining_budgets.append(budget_row)
+        storage.save_budgets(remaining_budgets)
+
         self.refresh_categories_list()
         self.refresh_budgets_section()
         messagebox.showinfo("Success", "Category deleted.")
-
+ 
     def build_budgets_section(self):
         section_label = tk.Label(self, text="Budgets", font=("Arial", 12, "bold"))
         section_label.pack(padx=10, pady=(10, 5), anchor="w")
