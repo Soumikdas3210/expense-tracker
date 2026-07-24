@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
-from gui.widgets import SummaryCard
-from gui.widgets import CategoryDropdown
+from tkinter import messagebox
+
 from services import expense_service
 from services import income_service
 from services import budget_service
-from utils.helpers import get_today_str
+from gui.widgets import SummaryCard
+from gui.widgets import CategoryDropdown
 from utils.helpers import format_currency
-from tkinter import messagebox
+from utils.helpers import get_today_str
 from gui.add_expense import AddExpenseWindow
 from gui.add_income import AddIncomeWindow
 
@@ -19,6 +20,7 @@ class DashboardFrame(tk.Frame):
 
         self.build_summary_cards()
         self.build_month_summary_label()
+        self.build_budget_warning_label()
         self.build_search_bar()
         self.build_transaction_table()
         self.build_button_row()
@@ -44,7 +46,11 @@ class DashboardFrame(tk.Frame):
 
     def build_month_summary_label(self):
         self.month_summary_label = tk.Label(self, text="This Month: ...", font=("Arial", 10))
-        self.month_summary_label.pack(padx=10, pady=(0, 10), anchor="w")
+        self.month_summary_label.pack(padx=10, pady=(0, 5), anchor="w")
+
+    def build_budget_warning_label(self):
+        self.budget_warning_label = tk.Label(self, text="", fg="red", font=("Arial", 10, "bold"))
+        self.budget_warning_label.pack(padx=10, pady=(0, 10), anchor="w")
 
     def build_search_bar(self):
         search_frame = tk.Frame(self)
@@ -121,8 +127,11 @@ class DashboardFrame(tk.Frame):
 
         budget_status = budget_service.get_budget_status_all(all_expenses)
         total_remaining = 0.0
+        over_budget_categories = []
         for category in budget_status:
             total_remaining = total_remaining + budget_status[category]["remaining"]
+            if budget_status[category]["over"] == True:
+                over_budget_categories.append(category)
 
         self.income_card.update_value(format_currency(total_income))
         self.expense_card.update_value(format_currency(total_expense))
@@ -131,6 +140,13 @@ class DashboardFrame(tk.Frame):
 
         summary_text = "This Month: Income " + format_currency(total_income) + "  |  Expense " + format_currency(total_expense)
         self.month_summary_label.config(text=summary_text)
+
+        if len(over_budget_categories) == 0:
+            self.budget_warning_label.config(text="")
+        else:
+            categories_text = ", ".join(over_budget_categories)
+            warning_text = "Over budget: " + categories_text
+            self.budget_warning_label.config(text=warning_text)
 
     def refresh_transaction_table(self):
         existing_rows = self.table.get_children()
@@ -214,6 +230,4 @@ class DashboardFrame(tk.Frame):
         messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
 
     def open_settings(self):
-        messagebox.showinfo("Coming Soon", "Settings screen is coming in Milestone 5.")        
-
-   
+        self.app.show_frame("Settings")
