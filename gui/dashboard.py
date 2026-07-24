@@ -228,7 +228,7 @@ class DashboardFrame(tk.Frame):
     
 
     def open_reports(self):
-        messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
+        self.app.show_frame("Reports")
 
     def open_settings(self):
         self.app.show_frame("Settings")
