@@ -281,3 +281,37 @@ class ReportsFrame(tk.Frame):
         self.current_report_rows = matching
         self.fill_table(matching)
         self.update_totals(matching)
+def export_report(self):
+        if len(self.current_report_rows) == 0:
+            messagebox.showerror("Error", "Generate a report first before exporting.")
+            return
+
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")],
+            title="Export Report As",
+        )
+
+        if file_path == "":
+            return
+
+        report_fields = ["date", "category", "amount", "payment_method", "description"]
+
+        file = open(file_path, "w", newline="", encoding="utf-8")
+        writer = csv.DictWriter(file, fieldnames=report_fields)
+        writer.writeheader()
+
+        for expense in self.current_report_rows:
+            row = {
+                "date": expense.date,
+                "category": expense.category,
+                "amount": expense.amount,
+                "payment_method": expense.payment_method,
+                "description": expense.description,
+            }
+            writer.writerow(row)
+
+        file.close()
+
+        messagebox.showinfo("Success", "Report exported.")
+ 
