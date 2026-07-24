@@ -151,3 +151,133 @@ class ReportsFrame(tk.Frame):
 
         self.category_report_dropdown = CategoryDropdown(self.input_area)
         self.category_report_dropdown.pack(side="left", padx=5)
+    def build_daily_report(self, date_str):
+        all_expenses = expense_service.get_all_expenses()
+
+        matching = []
+        for expense in all_expenses:
+            if expense.date == date_str:
+                matching.append(expense)
+
+        return matching
+
+    def build_weekly_report(self, date_str):
+        date_parts = date_str.split("-")
+        year = int(date_parts[0])
+        month = int(date_parts[1])
+        day = int(date_parts[2])
+        target_date = datetime.date(year, month, day)
+
+        weekday_number = target_date.weekday()
+        week_start = target_date - datetime.timedelta(days=weekday_number)
+        week_end = week_start + datetime.timedelta(days=6)
+
+        all_expenses = expense_service.get_all_expenses()
+
+        matching = []
+        for expense in all_expenses:
+            expense_date_parts = expense.date.split("-")
+            expense_year = int(expense_date_parts[0])
+            expense_month = int(expense_date_parts[1])
+            expense_day = int(expense_date_parts[2])
+            expense_date = datetime.date(expense_year, expense_month, expense_day)
+
+            if expense_date >= week_start and expense_date <= week_end:
+                matching.append(expense)
+
+        return matching
+
+    def build_monthly_report(self, year_str, month_str):
+        target_year_month = year_str + "-" + month_str
+
+        all_expenses = expense_service.get_all_expenses()
+
+        matching = []
+        for expense in all_expenses:
+            expense_year_month = expense.date[0:7]
+            if expense_year_month == target_year_month:
+                matching.append(expense)
+
+        return matching
+
+    def build_yearly_report(self, year_str):
+        all_expenses = expense_service.get_all_expenses()
+
+        matching = []
+        for expense in all_expenses:
+            expense_year = expense.date[0:4]
+            if expense_year == year_str:
+                matching.append(expense)
+
+        return matching
+
+    def build_category_report(self, category_name):
+        all_expenses = expense_service.get_all_expenses()
+
+        matching = []
+        for expense in all_expenses:
+            if expense.category == category_name:
+                matching.append(expense)
+
+        return matching
+
+    def fill_table(self, expenses):
+        existing_rows = self.report_table.get_children()
+        for row_id in existing_rows:
+            self.report_table.delete(row_id)
+
+        for expense in expenses:
+            row_values = (expense.date, expense.category, format_currency(expense.amount), expense.payment_method, expense.description)
+            self.report_table.insert("", "end", values=row_values)
+
+    def update_totals(self, expenses):
+        total = 0.0
+        for expense in expenses:
+            total = total + expense.amount
+
+        totals_text = "Total: " + format_currency(total) + "  (" + str(len(expenses)) + " transactions)"
+        self.totals_label.config(text=totals_text)
+
+    def on_generate(self):
+        report_type = self.report_type_dropdown.get()
+        matching = []
+
+        if report_type == "Daily":
+            date_value = self.daily_date_entry.get()
+            if validators.validate_date(date_value) == False:
+                messagebox.showerror("Error", "Please enter a valid date in YYYY-MM-DD format.")
+                return
+            matching = self.build_daily_report(date_value)
+
+        elif report_type == "Weekly":
+            date_value = self.weekly_date_entry.get()
+            if validators.validate_date(date_value) == False:
+                messagebox.showerror("Error", "Please enter a valid date in YYYY-MM-DD format.")
+                return
+            matching = self.build_weekly_report(date_value)
+
+        elif report_type == "Monthly":
+            month_value = self.monthly_month_dropdown.get()
+            year_value = self.monthly_year_dropdown.get()
+            if month_value == "" or year_value == "":
+                messagebox.showerror("Error", "Please select both a month and a year.")
+                return
+            matching = self.build_monthly_report(year_value, month_value)
+
+        elif report_type == "Yearly":
+            year_value = self.yearly_year_dropdown.get()
+            if year_value == "":
+                messagebox.showerror("Error", "Please select a year.")
+                return
+            matching = self.build_yearly_report(year_value)
+
+        elif report_type == "Category":
+            category_value = self.category_report_dropdown.get()
+            if category_value == "":
+                messagebox.showerror("Error", "Please select a category.")
+                return
+            matching = self.build_category_report(category_value)
+
+        self.current_report_rows = matching
+        self.fill_table(matching)
+        self.update_totals(matching)
