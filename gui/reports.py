@@ -281,7 +281,8 @@ class ReportsFrame(tk.Frame):
         self.current_report_rows = matching
         self.fill_table(matching)
         self.update_totals(matching)
-def export_report(self):
+
+    def export_report(self):
         if len(self.current_report_rows) == 0:
             messagebox.showerror("Error", "Generate a report first before exporting.")
             return
@@ -315,3 +316,4 @@ def export_report(self):
 
         messagebox.showinfo("Success", "Report exported.")
  
+
