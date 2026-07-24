@@ -8,14 +8,12 @@ from services import budget_service
 
 
 class SettingsFrame(tk.Frame):
-    def __init__(self, parent, app):
+  def __init__(self, parent, app):
         super().__init__(parent)
         self.app = app
 
-        self.build_back_button()
         self.build_categories_section()
         self.build_budgets_section()
-        self.build_data_section()
 
         self.refresh_categories_list()
         self.refresh_budgets_section()
