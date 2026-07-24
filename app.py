@@ -5,6 +5,7 @@ from tkinter import messagebox
 from gui.dashboard import DashboardFrame
 from gui.settings import SettingsFrame
 from gui.analytics import AnalyticsFrame
+from gui.reports import ReportsFrame
 
 
 class ExpenseTrackerApp(tk.Tk):
@@ -70,6 +71,10 @@ class ExpenseTrackerApp(tk.Tk):
         analytics_frame.place(x=0, y=0, relwidth=1, relheight=1)
         self.frames["Analytics"] = analytics_frame
 
+        reports_frame = ReportsFrame(self.container, self)
+        reports_frame.place(x=0, y=0, relwidth=1, relheight=1)
+        self.frames["Reports"] = reports_frame
+
     def show_frame(self, name):
         frame = self.frames[name]
         frame.tkraise()
@@ -96,7 +101,7 @@ class ExpenseTrackerApp(tk.Tk):
         self.show_frame("Analytics")
 
     def on_view_reports(self):
-        messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
+        self.show_frame("Reports")
 
     def on_about(self):
         messagebox.showinfo("About", "Personal Expense Tracker\nBuilt with Python, Tkinter, and NumPy.")
