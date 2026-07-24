@@ -4,6 +4,7 @@ from tkinter import messagebox
 
 from gui.dashboard import DashboardFrame
 from gui.settings import SettingsFrame
+from gui.analytics import AnalyticsFrame
 
 
 class ExpenseTrackerApp(tk.Tk):
@@ -65,9 +66,16 @@ class ExpenseTrackerApp(tk.Tk):
         settings_frame.place(x=0, y=0, relwidth=1, relheight=1)
         self.frames["Settings"] = settings_frame
 
+        analytics_frame = AnalyticsFrame(self.container, self)
+        analytics_frame.place(x=0, y=0, relwidth=1, relheight=1)
+        self.frames["Analytics"] = analytics_frame
+
     def show_frame(self, name):
         frame = self.frames[name]
         frame.tkraise()
+
+        if name == "Analytics":
+            self.frames["Analytics"].load_stats()
 
     def on_import_csv(self):
         self.show_frame("Settings")
@@ -85,7 +93,7 @@ class ExpenseTrackerApp(tk.Tk):
         self.show_frame("Dashboard")
 
     def on_view_analytics(self):
-        messagebox.showinfo("Coming Soon", "Analytics screen is coming in Milestone 6.")
+        self.show_frame("Analytics")
 
     def on_view_reports(self):
         messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
