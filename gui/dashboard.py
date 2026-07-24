@@ -224,7 +224,8 @@ class DashboardFrame(tk.Frame):
             self.refresh_transaction_table()
 
     def open_analytics(self):
-        messagebox.showinfo("Coming Soon", "Analytics screen is coming in Milestone 6.")
+        self.app.show_frame("Analytics")
+    
 
     def open_reports(self):
         messagebox.showinfo("Coming Soon", "Reports screen is coming in Milestone 7.")
