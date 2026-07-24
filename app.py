@@ -82,6 +82,9 @@ class ExpenseTrackerApp(tk.Tk):
         if name == "Analytics":
             self.frames["Analytics"].load_stats()
 
+        if name == "Dashboard":
+            self.frames["Dashboard"].category_filter.refresh_categories()
+
     def on_import_csv(self):
         self.show_frame("Settings")
 
