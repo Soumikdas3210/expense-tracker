@@ -20,6 +20,16 @@ def set_budget(category, monthly_limit):
 
     storage.save_budgets(updated_rows)
 
+def remove_budget(category):
+    rows = storage.load_budgets()
+
+    remaining_rows = []
+    for row in rows:
+        if row["category"] != category:
+            remaining_rows.append(row)
+
+    storage.save_budgets(remaining_rows)    
+
 
 def get_budget(category):
     rows = storage.load_budgets()

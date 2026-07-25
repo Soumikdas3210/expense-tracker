@@ -22,6 +22,9 @@ def validate_date(date_str):
     if date_str == "":
         return False
 
+    if len(date_str) != 10:
+        return False
+
     try:
         datetime.strptime(date_str, DATE_FORMAT)
         return True

@@ -1,3 +1,5 @@
 id,date,category,amount,payment_method,description,notes,is_recurring
 1,2026-07-18,Food,250.0,Cash,Groceries,,False
-2,2026-07-18,Food,350.0,Cash,Lunch with friends,updated amount,True
+2,2026-07-18,Food,450.0,Cash,Lunch with friends,updated amount,True
+4,2026-07-25,Transport,100.0,Cash,Bus cost,,True
+5,2026-07-20,Gaming,500.0,Cash,game price,,False

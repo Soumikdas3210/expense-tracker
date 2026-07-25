@@ -9,13 +9,6 @@ from gui.reports import ReportsFrame
 
 
 class ExpenseTrackerApp(tk.Tk):
-    """
-    Root window / shell for the Expense Tracker app.
-
-    Holds no business logic - only wires services to GUI callbacks,
-    and switches between full-screen "frames" (pages) inside one
-    container Frame using show_frame(name).
-    """
 
     def __init__(self):
         super().__init__()
@@ -34,12 +27,6 @@ class ExpenseTrackerApp(tk.Tk):
     def build_menu_bar(self):
         menu_bar = Menu(self)
 
-        file_menu = Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Import CSV", command=self.on_import_csv)
-        file_menu.add_command(label="Export CSV", command=self.on_export_csv)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.quit)
-        menu_bar.add_cascade(label="File", menu=file_menu)
 
         manage_menu = Menu(menu_bar, tearoff=0)
         manage_menu.add_command(label="Categories", command=self.on_manage_categories)
@@ -84,12 +71,8 @@ class ExpenseTrackerApp(tk.Tk):
 
         if name == "Dashboard":
             self.frames["Dashboard"].category_filter.refresh_categories()
-
-    def on_import_csv(self):
-        self.show_frame("Settings")
-
-    def on_export_csv(self):
-        self.show_frame("Settings")
+            self.frames["Dashboard"].refresh_summary()
+            self.frames["Dashboard"].refresh_transaction_table()
 
     def on_manage_categories(self):
         self.show_frame("Settings")

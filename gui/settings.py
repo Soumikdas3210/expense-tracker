@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-from tkinter import filedialog
-import csv
 
 from services import storage
 from services import budget_service
@@ -15,7 +13,6 @@ class SettingsFrame(tk.Frame):
         self.build_back_button()
         self.build_categories_section()
         self.build_budgets_section()
-        self.build_data_section()
 
         self.refresh_categories_list()
         self.refresh_budgets_section()
@@ -105,6 +102,17 @@ class SettingsFrame(tk.Frame):
             messagebox.showerror("Error", "Default categories cannot be deleted.")
             return
 
+        all_expenses = storage.load_expenses()
+        expense_count = 0
+        for expense_row in all_expenses:
+            if expense_row["category"] == selected_category["name"]:
+                expense_count = expense_count + 1
+
+        if expense_count > 0:
+            error_message = "Cannot delete '" + selected_category["name"] + "' - " + str(expense_count) + " expense(s) still use this category."
+            messagebox.showerror("Error", error_message)
+            return
+
         confirm_message = "Delete category '" + selected_category["name"] + "'?"
         confirmed = messagebox.askyesno("Confirm Delete", confirm_message)
 
@@ -179,6 +187,7 @@ class SettingsFrame(tk.Frame):
             value_text = entry.get()
 
             if value_text == "":
+                budget_service.remove_budget(category_name)
                 continue
 
             try:
@@ -195,75 +204,7 @@ class SettingsFrame(tk.Frame):
 
             budget_service.set_budget(category_name, value_number)
 
+        self.refresh_budgets_section()
         messagebox.showinfo("Success", "Budgets saved.")
 
-    def build_data_section(self):
-        section_label = tk.Label(self, text="Data", font=("Arial", 12, "bold"))
-        section_label.pack(padx=10, pady=(10, 5), anchor="w")
-
-        button_frame = tk.Frame(self)
-        button_frame.pack(padx=10, pady=(0, 10), fill="x")
-
-        import_button = tk.Button(button_frame, text="Import CSV", command=self.on_import_csv)
-        import_button.pack(side="left", padx=5)
-
-        export_button = tk.Button(button_frame, text="Export CSV", command=self.on_export_csv)
-        export_button.pack(side="left", padx=5)
-
-    def on_export_csv(self):
-        file_path = filedialog.asksaveasfilename(
-            defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv")],
-            title="Export Expenses As",
-        )
-
-        if file_path == "":
-            return
-
-        expenses = storage.load_expenses()
-
-        file = open(file_path, "w", newline="", encoding="utf-8")
-        writer = csv.DictWriter(file, fieldnames=storage.EXPENSE_FIELDS)
-        writer.writeheader()
-        writer.writerows(expenses)
-        file.close()
-
-        messagebox.showinfo("Success", "Expenses exported.")
-
-    def on_import_csv(self):
-        file_path = filedialog.askopenfilename(
-            filetypes=[("CSV files", "*.csv")],
-            title="Import Expenses From",
-        )
-
-        if file_path == "":
-            return
-
-        file = open(file_path, "r", newline="", encoding="utf-8")
-        reader = csv.DictReader(file)
-        imported_rows = list(reader)
-        file.close()
-
-        if reader.fieldnames is None:
-            messagebox.showerror("Error", "The selected file has no header row.")
-            return
-
-        missing_columns = []
-        for required_column in storage.EXPENSE_FIELDS:
-            if required_column not in reader.fieldnames:
-                missing_columns.append(required_column)
-
-        if len(missing_columns) > 0:
-            missing_text = ", ".join(missing_columns)
-            error_message = "The CSV is missing required columns: " + missing_text
-            messagebox.showerror("Error", error_message)
-            return
-
-        existing_expenses = storage.load_expenses()
-        combined_expenses = existing_expenses + imported_rows
-
-        storage.save_expenses(combined_expenses)
-
-        success_message = "Imported " + str(len(imported_rows)) + " expenses."
-        messagebox.showinfo("Success", success_message)
- 
+    

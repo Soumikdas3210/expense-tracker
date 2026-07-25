@@ -32,17 +32,20 @@ class DashboardFrame(tk.Frame):
         cards_frame = tk.Frame(self)
         cards_frame.pack(fill="x", padx=10, pady=10)
 
-        self.income_card = SummaryCard(cards_frame, "Total Income", "$0.00")
+        self.income_card = SummaryCard(cards_frame, "Income (This Month)", "$0.00")
         self.income_card.pack(side="left", expand=True, fill="x", padx=5)
 
-        self.expense_card = SummaryCard(cards_frame, "Total Expense", "$0.00")
+        self.expense_card = SummaryCard(cards_frame, "Expense (This Month)", "$0.00")
         self.expense_card.pack(side="left", expand=True, fill="x", padx=5)
 
-        self.balance_card = SummaryCard(cards_frame, "Balance", "$0.00")
+        self.balance_card = SummaryCard(cards_frame, "Balance (This Month)", "$0.00")
         self.balance_card.pack(side="left", expand=True, fill="x", padx=5)
 
-        self.budget_card = SummaryCard(cards_frame, "Budget Remaining", "$0.00")
+        self.budget_card = SummaryCard(cards_frame, "Budget Remaining (Budgeted Categories)", "$0.00")
         self.budget_card.pack(side="left", expand=True, fill="x", padx=5)
+
+        budget_note = tk.Label(self, text="Budget Remaining only totals categories that have a budget set in Settings.", font=("Arial", 9), fg="gray")
+        budget_note.pack(padx=10, anchor="w")
 
     def build_month_summary_label(self):
         self.month_summary_label = tk.Label(self, text="This Month: ...", font=("Arial", 10))
@@ -74,6 +77,9 @@ class DashboardFrame(tk.Frame):
         clear_button.pack(side="left", padx=5)
 
     def build_transaction_table(self):
+        table_note = tk.Label(self, text="Recent Transactions (all dates — not limited to this month)", font=("Arial", 9), fg="gray")
+        table_note.pack(padx=10, anchor="w")
+
         columns = ("date", "category", "amount", "payment", "description")
 
         self.table = ttk.Treeview(self, columns=columns, show="headings", height=10)
@@ -128,8 +134,10 @@ class DashboardFrame(tk.Frame):
         budget_status = budget_service.get_budget_status_all(all_expenses)
         total_remaining = 0.0
         over_budget_categories = []
+        budgeted_categories = []
         for category in budget_status:
             total_remaining = total_remaining + budget_status[category]["remaining"]
+            budgeted_categories.append(category)
             if budget_status[category]["over"] == True:
                 over_budget_categories.append(category)
 
@@ -141,12 +149,16 @@ class DashboardFrame(tk.Frame):
         summary_text = "This Month: Income " + format_currency(total_income) + "  |  Expense " + format_currency(total_expense)
         self.month_summary_label.config(text=summary_text)
 
-        if len(over_budget_categories) == 0:
-            self.budget_warning_label.config(text="")
-        else:
+        if len(over_budget_categories) > 0:
             categories_text = ", ".join(over_budget_categories)
             warning_text = "Over budget: " + categories_text
-            self.budget_warning_label.config(text=warning_text)
+            self.budget_warning_label.config(text=warning_text, fg="red")
+        elif len(budgeted_categories) > 0:
+            categories_text = ", ".join(budgeted_categories)
+            info_text = "Budgets tracked: " + categories_text + " (all within limit)"
+            self.budget_warning_label.config(text=info_text, fg="gray")
+        else:
+            self.budget_warning_label.config(text="")
 
     def refresh_transaction_table(self):
         existing_rows = self.table.get_children()
