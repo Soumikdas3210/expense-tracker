@@ -113,6 +113,14 @@ def search_income(filters):
 
     return results
 
+def get_income_date_field(income):
+    return income.date
+
+
+def get_recent_income(n=10):
+    all_income = get_all_income()
+    sorted_income = sorted(all_income, key=get_income_date_field, reverse=True)
+    return sorted_income[0:n]
 
 def get_total_income(period="month"):
     all_income = get_all_income()

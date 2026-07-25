@@ -18,18 +18,48 @@ class DashboardFrame(tk.Frame):
         super().__init__(parent)
         self.app = app
 
+        self.build_scrollable_area()
+
         self.build_summary_cards()
         self.build_month_summary_label()
         self.build_budget_warning_label()
         self.build_search_bar()
         self.build_transaction_table()
         self.build_button_row()
+        self.build_income_table()
 
         self.refresh_summary()
         self.refresh_transaction_table()
+        self.refresh_income_table()
+
+    def build_scrollable_area(self):
+        self.canvas = tk.Canvas(self, highlightthickness=0)
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.scrollbar.pack(side="right", fill="y")
+
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.content_frame = tk.Frame(self.canvas)
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.content_frame, anchor="nw")
+
+        self.content_frame.bind("<Configure>", self.on_content_configure)
+        self.canvas.bind("<Configure>", self.on_canvas_configure)
+        self.canvas.bind("<MouseWheel>", self.on_mouse_wheel)
+
+    def on_content_configure(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def on_canvas_configure(self, event):
+        self.canvas.itemconfig(self.canvas_window, width=event.width)
+
+    def on_mouse_wheel(self, event):
+        scroll_amount = int(-1 * (event.delta / 120))
+        self.canvas.yview_scroll(scroll_amount, "units")    
 
     def build_summary_cards(self):
-        cards_frame = tk.Frame(self)
+        cards_frame = tk.Frame(self.content_frame)
         cards_frame.pack(fill="x", padx=10, pady=10)
 
         self.income_card = SummaryCard(cards_frame, "Income (This Month)", "$0.00")
@@ -44,19 +74,19 @@ class DashboardFrame(tk.Frame):
         self.budget_card = SummaryCard(cards_frame, "Budget Remaining (Budgeted Categories)", "$0.00")
         self.budget_card.pack(side="left", expand=True, fill="x", padx=5)
 
-        budget_note = tk.Label(self, text="Budget Remaining only totals categories that have a budget set in Settings.", font=("Arial", 9), fg="gray")
+        budget_note = tk.Label(self.content_frame, text="Budget Remaining only totals categories that have a budget set in Settings.", font=("Arial", 9), fg="gray")
         budget_note.pack(padx=10, anchor="w")
 
     def build_month_summary_label(self):
-        self.month_summary_label = tk.Label(self, text="This Month: ...", font=("Arial", 10))
+        self.month_summary_label = tk.Label(self.content_frame, text="This Month: ...", font=("Arial", 10))
         self.month_summary_label.pack(padx=10, pady=(0, 5), anchor="w")
 
     def build_budget_warning_label(self):
-        self.budget_warning_label = tk.Label(self, text="", fg="red", font=("Arial", 10, "bold"))
+        self.budget_warning_label = tk.Label(self.content_frame, text="", fg="red", font=("Arial", 10, "bold"))
         self.budget_warning_label.pack(padx=10, pady=(0, 10), anchor="w")
 
     def build_search_bar(self):
-        search_frame = tk.Frame(self)
+        search_frame = tk.Frame(self.content_frame)
         search_frame.pack(fill="x", padx=10, pady=(0, 10))
 
         keyword_label = tk.Label(search_frame, text="Search:")
@@ -77,12 +107,12 @@ class DashboardFrame(tk.Frame):
         clear_button.pack(side="left", padx=5)
 
     def build_transaction_table(self):
-        table_note = tk.Label(self, text="Recent Transactions (all dates — not limited to this month)", font=("Arial", 9), fg="gray")
+        table_note = tk.Label(self.content_frame, text="Recent Transactions (all dates — not limited to this month)", font=("Arial", 10, "bold"))
         table_note.pack(padx=10, anchor="w")
 
         columns = ("date", "category", "amount", "payment", "description")
 
-        self.table = ttk.Treeview(self, columns=columns, show="headings", height=10)
+        self.table = ttk.Treeview(self.content_frame, columns=columns, show="headings", height=10)
         self.table.heading("date", text="Date")
         self.table.heading("category", text="Category")
         self.table.heading("amount", text="Amount")
@@ -92,14 +122,12 @@ class DashboardFrame(tk.Frame):
         self.table.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
     def build_button_row(self):
-        button_frame = tk.Frame(self)
+        button_frame = tk.Frame(self.content_frame)
         button_frame.pack(fill="x", padx=10, pady=(0, 10))
 
         add_expense_button = tk.Button(button_frame, text="Add Expense", command=self.on_add_expense)
         add_expense_button.pack(side="left", padx=5)
 
-        add_income_button = tk.Button(button_frame, text="Add Income", command=self.on_add_income)
-        add_income_button.pack(side="left", padx=5)
 
         edit_button = tk.Button(button_frame, text="Edit", command=self.on_edit_selected)
         edit_button.pack(side="left", padx=5)
@@ -115,6 +143,32 @@ class DashboardFrame(tk.Frame):
 
         settings_button = tk.Button(button_frame, text="Settings", command=self.open_settings)
         settings_button.pack(side="left", padx=5)
+
+    def build_income_table(self):
+        income_label = tk.Label(self.content_frame, text="Recent Income", font=("Arial", 10, "bold"))
+        income_label.pack(padx=10, pady=(0, 0), anchor="w")
+
+        columns = ("date", "source", "amount", "description")
+
+        self.income_table = ttk.Treeview(self.content_frame, columns=columns, show="headings", height=4)
+        self.income_table.heading("date", text="Date")
+        self.income_table.heading("source", text="Source")
+        self.income_table.heading("amount", text="Amount")
+        self.income_table.heading("description", text="Description")
+
+        self.income_table.pack(fill="x", padx=10, pady=(0, 5))
+
+        income_button_frame = tk.Frame(self.content_frame)
+        income_button_frame.pack(fill="x", padx=10, pady=(0, 10))
+
+        add_income_button = tk.Button(income_button_frame, text="Add Income", command=self.on_add_income)
+        add_income_button.pack(side="left", padx=5)
+
+        edit_income_button = tk.Button(income_button_frame, text="Edit Income", command=self.on_edit_income_selected)
+        edit_income_button.pack(side="left", padx=5)
+
+        delete_income_button = tk.Button(income_button_frame, text="Delete Income", command=self.on_delete_income_selected)
+        delete_income_button.pack(side="left", padx=5)    
 
     def refresh_summary(self):
         total_income = income_service.get_total_income("month")
@@ -171,6 +225,17 @@ class DashboardFrame(tk.Frame):
             row_values = (expense.date, expense.category, format_currency(expense.amount), expense.payment_method, expense.description)
             self.table.insert("", "end", iid=str(expense.id), values=row_values)
 
+    def refresh_income_table(self):
+        existing_rows = self.income_table.get_children()
+        for row_id in existing_rows:
+            self.income_table.delete(row_id)
+
+        recent_income = income_service.get_recent_income(10)
+
+        for income in recent_income:
+            row_values = (income.date, income.source, format_currency(income.amount), income.description)
+            self.income_table.insert("", "end", iid=str(income.id), values=row_values)        
+
     def on_search_changed(self, event):
         keyword = self.keyword_entry.get()
         category = self.category_filter.get()
@@ -206,6 +271,14 @@ class DashboardFrame(tk.Frame):
         selected_id_str = selection[0]
         return int(selected_id_str)
 
+    def get_selected_income_id(self):
+        selection = self.income_table.selection()
+        if len(selection) == 0:
+            return None
+        selected_id_str = selection[0]
+        return int(selected_id_str)
+    
+
     def on_add_expense(self):
         AddExpenseWindow(self, on_success=self.on_transaction_saved)
 
@@ -219,9 +292,17 @@ class DashboardFrame(tk.Frame):
             return
         AddExpenseWindow(self, on_success=self.on_transaction_saved, expense_id=expense_id)
 
+    def on_edit_income_selected(self):
+        income_id = self.get_selected_income_id()
+        if income_id is None:
+            messagebox.showinfo("No Selection", "Select an income entry first.")
+            return
+        AddIncomeWindow(self, on_success=self.on_transaction_saved, income_id=income_id)    
+
     def on_transaction_saved(self):
         self.refresh_summary()
         self.refresh_transaction_table()
+        self.refresh_income_table()
 
     def on_delete_selected(self):
         expense_id = self.get_selected_expense_id()
@@ -234,6 +315,18 @@ class DashboardFrame(tk.Frame):
             expense_service.delete_expense(expense_id)
             self.refresh_summary()
             self.refresh_transaction_table()
+
+    def on_delete_income_selected(self):
+        income_id = self.get_selected_income_id()
+        if income_id is None:
+            messagebox.showinfo("No Selection", "Select an income entry first.")
+            return
+
+        confirmed = messagebox.askyesno("Confirm Delete", "Delete this income entry?")
+        if confirmed == True:
+            income_service.delete_income(income_id)
+            self.refresh_summary()
+            self.refresh_income_table()        
 
     def open_analytics(self):
         self.app.show_frame("Analytics")

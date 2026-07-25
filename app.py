@@ -73,6 +73,7 @@ class ExpenseTrackerApp(tk.Tk):
             self.frames["Dashboard"].category_filter.refresh_categories()
             self.frames["Dashboard"].refresh_summary()
             self.frames["Dashboard"].refresh_transaction_table()
+            self.frames["Dashboard"].refresh_income_table()
 
     def on_manage_categories(self):
         self.show_frame("Settings")
